@@ -2,7 +2,7 @@
  * This class represents a binary search tree.
  * @author Niels Heltner (nhelt15) & Antonio Lascari (anlas15)
  */
-public class DictBinTree implements Dict {
+public class DictBinTree {
     
     /**
      * The root of the tree.
@@ -29,7 +29,6 @@ public class DictBinTree implements Dict {
      * other nodes in the tree, starting from the root.
      * @param key The key wished to be inserted into the tree.
      */
-    @Override
     public void insert(int key) {
         Node y = null;
         Node x = root;
@@ -60,7 +59,6 @@ public class DictBinTree implements Dict {
      * elements in order.
      * @return all elements in order.
      */
-    @Override
     public int[] orderedTraversal() {
         int[] array = new int[size];
         pointer = 0;
@@ -82,7 +80,6 @@ public class DictBinTree implements Dict {
         }
     }
     
-    @Override
     public int getFrequency() {
         int total = 0;
         int[] a = orderedTraversal();
@@ -102,7 +99,6 @@ public class DictBinTree implements Dict {
      * or not.
      * @return 
      */
-    @Override
     public boolean search(int key) {
         Node x = root;
         while(x != null) {

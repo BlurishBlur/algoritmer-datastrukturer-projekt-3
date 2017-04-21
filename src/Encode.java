@@ -12,50 +12,78 @@ import java.util.logging.Logger;
  */
 public class Encode {
 
-    public static void main(String[] args) {
-        int[] array = new int[256];
-        try {
-            FileInputStream in = new FileInputStream("src/t.txt");
-            boolean running = true;
-            int b;
-            try {
-                while ((b = in.read()) != -1) {
-                    array[b]++;
-                    System.out.println(Arrays.toString(array));
-                }
+    public static final int BYTE_RANGE = 256;
+
+    public int[] getFrequencies(String path) {
+        int[] frequencies = null;
+        try (FileInputStream in = new FileInputStream("src/t.txt")) {
+            frequencies = new int[BYTE_RANGE];
+            int currentByte;
+            while ((currentByte = in.read()) != -1) {
+                frequencies[currentByte]++;
             }
-            catch (IOException ex) {
-                Logger.getLogger(Encode.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            Element element = huffman(array);
-            int[] ar = ((Dict) element.data).orderedTraversal();
-            System.out.println(Arrays.toString(ar));
         }
-        catch (FileNotFoundException ex) {
-            Logger.getLogger(Encode.class.getName()).log(Level.SEVERE, null, ex);
+        catch (IOException e) {
+            e.printStackTrace();
         }
+        return frequencies;
     }
 
-    private static Element huffman(int[] c) {
+    private Element createHuffmanTree(int[] c) {
         int n = c.length;
         PQ heap = new PQHeap(c.length);
         for (int i = 0; i < c.length; i++) {
+            if(c[i] > 0)
             heap.insert(new Element(c[i]));
         }
-        for (int i = 0; i < n - 1; i++) {
-            Element e = new Element();
+        for (int i = 0; i < 5; i++) {
+            Element e = new Element(new BinaryTree());
 
             Element first = heap.extractMin();
             Element second = heap.extractMin();
 
-            e.data = new DictBinTree();
-            ((Dict) e.data).insert(first.key);
-            ((Dict) e.data).insert(second.key);
-            e.key = ((Dict) e.data).getFrequency();
+            if (first.getData() != null) {
+                int[] f = ((IBinaryTree) first.getData()).orderedTraversal();
+                for (int j = 0; j < f.length; j++) {
+                    ((IBinaryTree) e.getData()).insert(f[j]);
+                }
+            }
+            else {
+                ((IBinaryTree) e.getData()).insert(first.getKey());
+            }
+            if (second.getData() != null) {
+                int[] s = ((IBinaryTree) second.getData()).orderedTraversal();
+                for (int j = 0; j < s.length; j++) {
+                    ((IBinaryTree) e.getData()).insert(s[j]);
+                }
+            }
+            else {
+                ((IBinaryTree) e.getData()).insert(second.getKey());
+            }
+
+            //((IBinaryTree) e.getData()).insert(first.getKey());
+            //((IBinaryTree) e.getData()).insert(second.getKey());
+            e.setKey(((IBinaryTree) e.getData()).getFrequency());
+            System.out.println(e.getKey());
 
             heap.insert(e);
         }
         return heap.extractMin();
+    }
+    
+    public void createCodewords(String[] codes, int[] a, String string) {
+        for (int i = 0; i < a.length; i++) {
+            createCodewords(codes, a, string);
+        }
+    }
+
+    public static void main(String[] args) {
+        Encode encode = new Encode();
+        int[] frequencies = encode.getFrequencies("src/t.txt");
+        int[] ar = ((IBinaryTree) encode.createHuffmanTree(frequencies).getData()).orderedTraversal();
+        System.out.println(Arrays.toString(ar));
+//encode.createCodewords(new String[BYTE_RANGE], ar, "");
+
     }
 
 }
