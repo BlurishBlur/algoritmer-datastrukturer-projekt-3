@@ -73,4 +73,8 @@ public class Node {
         this.rightChild = rightChild;
     }
     
+    public boolean isLeaf() {
+        return leftChild == null && rightChild == null;
+    }
+    
 }

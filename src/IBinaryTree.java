@@ -7,8 +7,10 @@ public interface IBinaryTree {
     
     void insert(int key);
     
-    int[] orderedTraversal();
+    int[] orderedTraversal(boolean print);
     
     int getFrequency();
+    
+    Node getRoot();
     
 }

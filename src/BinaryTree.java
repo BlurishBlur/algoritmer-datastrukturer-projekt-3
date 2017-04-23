@@ -32,13 +32,19 @@ public class BinaryTree implements IBinaryTree {
         }
         return node;
     }
+    
+    @Override
+    public Node getRoot() {
+        return root;
+    }
 
     @Override
-    public int[] orderedTraversal() {
+    public int[] orderedTraversal(boolean print) {
         int[] array = new int[size];
         pointer = 0;
+        if(print)
+        System.out.println("root key: " + root.getKey());
         inorderTreeWalk(root, array);
-        System.out.println(root.getKey());
         return array;
     }
     
@@ -53,7 +59,7 @@ public class BinaryTree implements IBinaryTree {
     @Override
     public int getFrequency() {
         int total = 0;
-        int[] a = orderedTraversal();
+        int[] a = orderedTraversal(false);
         for (int i = 0; i < a.length; i++) {
             total += a[i];
         }
