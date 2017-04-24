@@ -41,6 +41,10 @@ public class Node {
         return key;
     }
     
+    public void setKey(int key) {
+        this.key = key;
+    }
+    
     /**
      * Returns the left child node of this node.
      * @return the left child node of this node.

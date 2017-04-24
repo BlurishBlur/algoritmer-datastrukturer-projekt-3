@@ -1,6 +1,7 @@
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.logging.Level;
@@ -33,12 +34,20 @@ public class Encode {
         int n = c.length;
         PQ heap = new PQHeap(c.length);
         for (int i = 0; i < c.length; i++) {
-            if (c[i] > 0) {
-                heap.insert(new Element(c[i]));
-            }
+            heap.insert(new Element(c[i], new Node(i)));
         }
-        for (int i = 0; i < 5; i++) {
-            Element e = new Element(new BinaryTree());
+        for (int i = 0; i < n - 1; i++) {
+            //System.out.println("run " + i);
+            Node node = new Node();
+
+            Element leftChild = heap.extractMin();
+            Element rightChild = heap.extractMin();
+
+            node.setLeftChild((Node) leftChild.getData());
+            node.setRightChild((Node) rightChild.getData());
+
+            heap.insert(new Element(leftChild.getKey() + rightChild.getKey(), node));
+            /*Element e = new Element(new BinaryTree());
 
             Element first = heap.extractMin();
             Element second = heap.extractMin();
@@ -67,7 +76,7 @@ public class Encode {
             e.setKey(((IBinaryTree) e.getData()).getFrequency());
             //System.out.println("run " + i + ": " + e.getKey());
 
-            heap.insert(e);
+            heap.insert(e);*/
         }
         return heap.extractMin();
     }
@@ -77,7 +86,7 @@ public class Encode {
             System.out.println(node.getKey());
             if (node.isLeaf()) {
                 codeWords[node.getKey()] = codeWord;
-                System.out.println("new codeword");
+                System.out.println("new codeword: " + codeWord);
             }
             else {
                 createCodeWords(codeWords, node.getLeftChild(), codeWord + "0");
@@ -91,13 +100,56 @@ public class Encode {
         int[] frequencies = encode.getFrequencies("src/t.txt");
         //System.out.println(encode.createHuffmanTree(frequencies).getKey());
         //int[] ar = ((IBinaryTree) encode.createHuffmanTree(frequencies).getData()).orderedTraversal(false);
-        IBinaryTree huffmanTree = ((IBinaryTree) encode.createHuffmanTree(frequencies).getData());
-        String[] c = new String[BYTE_RANGE];
-        encode.createCodeWords(c, huffmanTree.getRoot(), "");
-        System.out.println(Arrays.toString(c));
+        Element huffmanTree = encode.createHuffmanTree(frequencies);
+        String[] codeWords = new String[BYTE_RANGE];
+        encode.createCodeWords(codeWords, (Node) huffmanTree.getData(), "");
+        //System.out.println(Arrays.toString(codeWords));
 
-        //System.out.println(Arrays.toString(ar));
-//encode.createCodewords(new String[BYTE_RANGE], ar, "");
+        BitOutputStream out = null;
+        FileInputStream in = null;
+        try {
+            out = new BitOutputStream(new FileOutputStream("src/output.txt"));
+            for (int frequency : frequencies) {
+                out.writeInt(frequency);
+            }
+            in = new FileInputStream("src/t.txt");
+            int currentByte;
+            while ((currentByte = in.read()) != -1) {
+                String codeword = codeWords[currentByte];
+                for (String character : codeword.split("")) {
+                    out.writeBit(Integer.valueOf(character));
+                }
+            }
+        }
+        catch (FileNotFoundException e) {
+            System.err.println("Kunne ikke finde stien til output fil");
+            e.printStackTrace();
+        }
+        catch (IOException e) {
+            Logger.getLogger(Encode.class.getName()).log(Level.SEVERE, null, e);
+        }
+        finally {
+            if (in != null) {
+                try {
+                    in.close();
+                }
+                catch (IOException e) {
+                    System.err.println("Fejl ved lukning af inputstream");
+                    e.printStackTrace();
+                }
+            }
+            if (out != null) {
+                try {
+                    out.writeBit(0);
+                    out.writeBit(1);
+                    out.close();
+                }
+                catch (IOException e) {
+                    System.err.println("Fejl ved lukning af outputstream");
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
 }
