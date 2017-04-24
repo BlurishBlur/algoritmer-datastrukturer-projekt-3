@@ -37,8 +37,8 @@ public class Decode {
         BitInputStream in = null;
         FileOutputStream out = null;
         try {
-            in = new BitInputStream(new FileInputStream("src/output.txt"));
-            out = new FileOutputStream("src/dekodetout.txt");
+            in = new BitInputStream(new FileInputStream("data/output.txt"));
+            out = new FileOutputStream("data/dekodetout.txt");
             frequencies = new int[Encode.BYTE_RANGE];
             int totalBytes = 0;
             for (int i = 0; i < Encode.BYTE_RANGE; i++) {
@@ -51,16 +51,16 @@ public class Decode {
             int currentBit;
             int writtenBytes = 0;
             while ((currentBit = in.readBit()) != -1 || writtenBytes < totalBytes) {
-                if(node == null) {
+                if (node == null) {
                     node = (Node) huffmanTree.getData();
                 }
-                if(node.isLeaf()) {
+                if (node.isLeaf()) {
                     out.write(node.getKey());
                     System.out.println(node.getKey());
                     writtenBytes++;
                     node = null;
                 }
-                else if(currentBit == 1) {
+                else if (currentBit == 1) {
                     node = node.getRightChild();
                     System.out.println("1");
                 }
@@ -75,7 +75,7 @@ public class Decode {
             e.printStackTrace();
         }
         finally {
-            if(in != null) {
+            if (in != null) {
                 try {
                     in.close();
                 }
@@ -83,7 +83,7 @@ public class Decode {
                     Logger.getLogger(Decode.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
-            if(out != null) {
+            if (out != null) {
                 try {
                     out.close();
                 }

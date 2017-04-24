@@ -17,7 +17,7 @@ public class Encode {
 
     public int[] getFrequencies(String path) {
         int[] frequencies = null;
-        try (FileInputStream in = new FileInputStream("src/t.txt")) {
+        try (FileInputStream in = new FileInputStream("data/input.txt")) {
             frequencies = new int[BYTE_RANGE];
             int currentByte;
             while ((currentByte = in.read()) != -1) {
@@ -83,10 +83,10 @@ public class Encode {
 
     public void createCodeWords(String[] codeWords, Node node, String codeWord) {
         if (node != null) {
-            //System.out.println(node.getKey());
+            System.out.println(node.getKey());
             if (node.isLeaf()) {
                 codeWords[node.getKey()] = codeWord;
-                //System.out.println("new codeword: " + codeWord);
+                System.out.println("new codeword: " + codeWord);
             }
             else {
                 createCodeWords(codeWords, node.getLeftChild(), codeWord + "0");
@@ -97,7 +97,7 @@ public class Encode {
 
     public static void main(String[] args) {
         Encode encode = new Encode();
-        int[] frequencies = encode.getFrequencies("src/t.txt");
+        int[] frequencies = encode.getFrequencies("data/input.txt");
         //System.out.println(encode.createHuffmanTree(frequencies).getKey());
         //int[] ar = ((IBinaryTree) encode.createHuffmanTree(frequencies).getData()).orderedTraversal(false);
         Element huffmanTree = encode.createHuffmanTree(frequencies);
@@ -108,11 +108,11 @@ public class Encode {
         BitOutputStream out = null;
         FileInputStream in = null;
         try {
-            out = new BitOutputStream(new FileOutputStream("src/output.txt"));
+            out = new BitOutputStream(new FileOutputStream("data/output.txt"));
             for (int frequency : frequencies) {
                 out.writeInt(frequency);
             }
-            in = new FileInputStream("src/t.txt");
+            in = new FileInputStream("data/input.txt");
             int currentByte;
             while ((currentByte = in.read()) != -1) {
                 String codeword = codeWords[currentByte];
