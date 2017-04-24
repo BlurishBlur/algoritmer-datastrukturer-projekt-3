@@ -83,10 +83,10 @@ public class Encode {
 
     public void createCodeWords(String[] codeWords, Node node, String codeWord) {
         if (node != null) {
-            System.out.println(node.getKey());
+            //System.out.println(node.getKey());
             if (node.isLeaf()) {
                 codeWords[node.getKey()] = codeWord;
-                System.out.println("new codeword: " + codeWord);
+                //System.out.println("new codeword: " + codeWord);
             }
             else {
                 createCodeWords(codeWords, node.getLeftChild(), codeWord + "0");
@@ -116,8 +116,8 @@ public class Encode {
             int currentByte;
             while ((currentByte = in.read()) != -1) {
                 String codeword = codeWords[currentByte];
-                for (String character : codeword.split("")) {
-                    out.writeBit(Integer.valueOf(character));
+                for (char character : codeword.toCharArray()) {
+                    out.writeBit(Character.getNumericValue(character));
                 }
             }
         }
