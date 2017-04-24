@@ -3,7 +3,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -17,7 +16,7 @@ public class Encode {
 
     public int[] getFrequencies(String path) {
         int[] frequencies = null;
-        try (FileInputStream in = new FileInputStream("data/input.txt")) {
+        try (FileInputStream in = new FileInputStream(path)) {
             frequencies = new int[BYTE_RANGE];
             int currentByte;
             while ((currentByte = in.read()) != -1) {
@@ -37,7 +36,6 @@ public class Encode {
             heap.insert(new Element(c[i], new Node(i)));
         }
         for (int i = 0; i < n - 1; i++) {
-            //System.out.println("run " + i);
             Node node = new Node();
 
             Element leftChild = heap.extractMin();
@@ -47,46 +45,14 @@ public class Encode {
             node.setRightChild((Node) rightChild.getData());
 
             heap.insert(new Element(leftChild.getKey() + rightChild.getKey(), node));
-            /*Element e = new Element(new BinaryTree());
-
-            Element first = heap.extractMin();
-            Element second = heap.extractMin();
-
-            if (first.getData() != null) {
-                int[] f = ((IBinaryTree) first.getData()).orderedTraversal(false);
-                for (int j = 0; j < f.length; j++) {
-                    ((IBinaryTree) e.getData()).insert(f[j]);
-                }
-            }
-            else {
-                ((IBinaryTree) e.getData()).insert(first.getKey());
-            }
-            if (second.getData() != null) {
-                int[] s = ((IBinaryTree) second.getData()).orderedTraversal(false);
-                for (int j = 0; j < s.length; j++) {
-                    ((IBinaryTree) e.getData()).insert(s[j]);
-                }
-            }
-            else {
-                ((IBinaryTree) e.getData()).insert(second.getKey());
-            }
-
-            //((IBinaryTree) e.getData()).insert(first.getKey());
-            //((IBinaryTree) e.getData()).insert(second.getKey());
-            e.setKey(((IBinaryTree) e.getData()).getFrequency());
-            //System.out.println("run " + i + ": " + e.getKey());
-
-            heap.insert(e);*/
         }
         return heap.extractMin();
     }
 
     public void createCodeWords(String[] codeWords, Node node, String codeWord) {
         if (node != null) {
-            System.out.println(node.getKey());
             if (node.isLeaf()) {
                 codeWords[node.getKey()] = codeWord;
-                System.out.println("new codeword: " + codeWord);
             }
             else {
                 createCodeWords(codeWords, node.getLeftChild(), codeWord + "0");
@@ -97,13 +63,17 @@ public class Encode {
 
     public static void main(String[] args) {
         Encode encode = new Encode();
+        long start = System.currentTimeMillis();
         int[] frequencies = encode.getFrequencies("data/input.txt");
-        //System.out.println(encode.createHuffmanTree(frequencies).getKey());
-        //int[] ar = ((IBinaryTree) encode.createHuffmanTree(frequencies).getData()).orderedTraversal(false);
+        System.out.println("Read frequencies: " + (System.currentTimeMillis() - start) + "ms");
+        start = System.currentTimeMillis();
         Element huffmanTree = encode.createHuffmanTree(frequencies);
+        System.out.println("Create huffman tree: " + (System.currentTimeMillis() - start) + "ms");
+        start = System.currentTimeMillis();
         String[] codeWords = new String[BYTE_RANGE];
         encode.createCodeWords(codeWords, (Node) huffmanTree.getData(), "");
-        //System.out.println(Arrays.toString(codeWords));
+        System.out.println("Create codewords: " + (System.currentTimeMillis() - start) + "ms");
+        start = System.currentTimeMillis();
 
         BitOutputStream out = null;
         FileInputStream in = null;
@@ -112,6 +82,8 @@ public class Encode {
             for (int frequency : frequencies) {
                 out.writeInt(frequency);
             }
+            System.out.println("Write frequencies: " + (System.currentTimeMillis() - start) + "ms");
+            start = System.currentTimeMillis();
             in = new FileInputStream("data/input.txt");
             int currentByte;
             while ((currentByte = in.read()) != -1) {
@@ -120,6 +92,8 @@ public class Encode {
                     out.writeBit(Character.getNumericValue(character));
                 }
             }
+            System.out.println("Write codewords: " + (System.currentTimeMillis() - start) + "ms");
+            start = System.currentTimeMillis();
         }
         catch (FileNotFoundException e) {
             System.err.println("Kunne ikke finde stien til output fil");

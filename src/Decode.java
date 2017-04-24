@@ -50,26 +50,25 @@ public class Decode {
             Node node = null;
             int currentBit;
             int writtenBytes = 0;
-            while ((currentBit = in.readBit()) != -1 || writtenBytes < totalBytes) {
+            while (writtenBytes < totalBytes) {
                 if (node == null) {
                     node = (Node) huffmanTree.getData();
                 }
                 if (node.isLeaf()) {
                     out.write(node.getKey());
-                    System.out.println(node.getKey());
                     writtenBytes++;
                     node = null;
                 }
-                else if (currentBit == 1) {
-                    node = node.getRightChild();
-                    System.out.println("1");
-                }
                 else {
-                    node = node.getLeftChild();
-                    System.out.println("0");
+                    currentBit = in.readBit();
+                    if (currentBit == 1) {
+                        node = node.getRightChild();
+                    }
+                    else {
+                        node = node.getLeftChild();
+                    }
                 }
             }
-
         }
         catch (IOException e) {
             e.printStackTrace();
