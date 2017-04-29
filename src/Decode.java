@@ -11,64 +11,55 @@ import java.util.logging.Logger;
  */
 public class Decode {
 
-    private Element createHuffmanTree(int[] c) {
-        int n = c.length;
-        PQ heap = new PQHeap(c.length);
-        for (int i = 0; i < c.length; i++) {
-            heap.insert(new Element(c[i], new Node(i)));
-        }
-        for (int i = 0; i < n - 1; i++) {
-            Node node = new Node();
+    private int[] frequencies;
 
-            Element leftChild = heap.extractMin();
-            Element rightChild = heap.extractMin();
-
-            node.setLeftChild((Node) leftChild.getData());
-            node.setRightChild((Node) rightChild.getData());
-
-            heap.insert(new Element(leftChild.getKey() + rightChild.getKey(), node));
-        }
-        return heap.extractMin();
+    public Decode() {
+        frequencies = new int[Encode.BYTE_RANGE];
     }
 
-    public static void main(String[] args) {
-        Decode decode = new Decode();
-        int[] frequencies = null;
+    private int readAndSumFrequencies(BitInputStream in) throws IOException {
+        int totalBytes = 0;
+        for (int i = 0; i < Encode.BYTE_RANGE; i++) {
+            frequencies[i] = in.readInt();
+            totalBytes += frequencies[i];
+        }
+        return totalBytes;
+    }
+
+    private void decodeCodeWords(int totalBytes, FileOutputStream out, BitInputStream in) throws IOException {
+        Element huffmanTree = HuffmanTree.getInstance().getHuffmanTreeRoot(frequencies);
+        Node node = null;
+        int currentBit;
+        int writtenBytes = 0;
+        while (writtenBytes < totalBytes) {
+            if (node == null) {
+                node = (Node) huffmanTree.getData();
+            }
+            if (node.isLeaf()) {
+                out.write(node.getKey());
+                writtenBytes++;
+                node = null;
+            }
+            else {
+                currentBit = in.readBit();
+                if (currentBit == 1) {
+                    node = node.getRightChild();
+                }
+                else {
+                    node = node.getLeftChild();
+                }
+            }
+        }
+    }
+
+    private void writeOutput(String inputPath, String outputPath) {
         BitInputStream in = null;
         FileOutputStream out = null;
         try {
-            in = new BitInputStream(new FileInputStream("data/output.txt"));
-            out = new FileOutputStream("data/dekodetout.txt");
-            frequencies = new int[Encode.BYTE_RANGE];
-            int totalBytes = 0;
-            for (int i = 0; i < Encode.BYTE_RANGE; i++) {
-                frequencies[i] = in.readInt();
-                totalBytes += frequencies[i];
-            }
+            in = new BitInputStream(new FileInputStream(inputPath));
+            out = new FileOutputStream(outputPath);
+            decodeCodeWords(readAndSumFrequencies(in), out, in);
 
-            Element huffmanTree = decode.createHuffmanTree(frequencies);
-            Node node = null;
-            int currentBit;
-            int writtenBytes = 0;
-            while (writtenBytes < totalBytes) {
-                if (node == null) {
-                    node = (Node) huffmanTree.getData();
-                }
-                if (node.isLeaf()) {
-                    out.write(node.getKey());
-                    writtenBytes++;
-                    node = null;
-                }
-                else {
-                    currentBit = in.readBit();
-                    if (currentBit == 1) {
-                        node = node.getRightChild();
-                    }
-                    else {
-                        node = node.getLeftChild();
-                    }
-                }
-            }
         }
         catch (IOException e) {
             e.printStackTrace();
@@ -91,7 +82,21 @@ public class Decode {
                 }
             }
         }
+    }
+    
+    private void start(String inputPath, String outputPath) {
+        new Decode().writeOutput(inputPath, outputPath);
+    }
 
+    public static void main(String[] args) {
+        if (args.length == 2) {
+            System.out.println("Initializing...");
+            new Decode().start(args[0], args[1]);
+            System.out.println("Finished.");
+        }
+        else {
+            System.out.println("Illegal syntax.\nUsage: \"nameOfCompressedFile\" \"nameOfOriginalFile\"");
+        }
     }
 
 }

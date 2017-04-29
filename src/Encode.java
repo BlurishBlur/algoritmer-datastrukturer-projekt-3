@@ -13,11 +13,16 @@ import java.util.logging.Logger;
 public class Encode {
 
     public static final int BYTE_RANGE = 256;
+    private int[] frequencies;
+    private String[] codeWords;
 
-    public int[] getFrequencies(String path) {
-        int[] frequencies = null;
+    public Encode() {
+        frequencies = new int[BYTE_RANGE];
+        codeWords = new String[BYTE_RANGE];
+    }
+
+    private void readFrequencies(String path) {
         try (FileInputStream in = new FileInputStream(path)) {
-            frequencies = new int[BYTE_RANGE];
             int currentByte;
             while ((currentByte = in.read()) != -1) {
                 frequencies[currentByte]++;
@@ -26,65 +31,29 @@ public class Encode {
         catch (IOException e) {
             e.printStackTrace();
         }
-        return frequencies;
     }
 
-    private Element createHuffmanTree(int[] c) {
-        int n = c.length;
-        PQ heap = new PQHeap(c.length);
-        for (int i = 0; i < c.length; i++) {
-            heap.insert(new Element(c[i], new Node(i)));
-        }
-        for (int i = 0; i < n - 1; i++) {
-            Node node = new Node();
-
-            Element leftChild = heap.extractMin();
-            Element rightChild = heap.extractMin();
-
-            node.setLeftChild((Node) leftChild.getData());
-            node.setRightChild((Node) rightChild.getData());
-
-            heap.insert(new Element(leftChild.getKey() + rightChild.getKey(), node));
-        }
-        return heap.extractMin();
-    }
-
-    public void createCodeWords(String[] codeWords, Node node, String codeWord) {
+    private void createCodeWords(Node node, String codeWord) {
         if (node != null) {
             if (node.isLeaf()) {
                 codeWords[node.getKey()] = codeWord;
             }
             else {
-                createCodeWords(codeWords, node.getLeftChild(), codeWord + "0");
-                createCodeWords(codeWords, node.getRightChild(), codeWord + "1");
+                createCodeWords(node.getLeftChild(), codeWord + "0");
+                createCodeWords(node.getRightChild(), codeWord + "1");
             }
         }
     }
 
-    public static void main(String[] args) {
-        Encode encode = new Encode();
-        long start = System.currentTimeMillis();
-        int[] frequencies = encode.getFrequencies("data/input.txt");
-        System.out.println("Read frequencies: " + (System.currentTimeMillis() - start) + "ms");
-        start = System.currentTimeMillis();
-        Element huffmanTree = encode.createHuffmanTree(frequencies);
-        System.out.println("Create huffman tree: " + (System.currentTimeMillis() - start) + "ms");
-        start = System.currentTimeMillis();
-        String[] codeWords = new String[BYTE_RANGE];
-        encode.createCodeWords(codeWords, (Node) huffmanTree.getData(), "");
-        System.out.println("Create codewords: " + (System.currentTimeMillis() - start) + "ms");
-        start = System.currentTimeMillis();
-
+    private void writeOutput(String outputPath, String inputPath) {
         BitOutputStream out = null;
         FileInputStream in = null;
         try {
-            out = new BitOutputStream(new FileOutputStream("data/output.txt"));
+            out = new BitOutputStream(new FileOutputStream(outputPath));
             for (int frequency : frequencies) {
                 out.writeInt(frequency);
             }
-            System.out.println("Write frequencies: " + (System.currentTimeMillis() - start) + "ms");
-            start = System.currentTimeMillis();
-            in = new FileInputStream("data/input.txt");
+            in = new FileInputStream(inputPath);
             int currentByte;
             while ((currentByte = in.read()) != -1) {
                 String codeword = codeWords[currentByte];
@@ -92,8 +61,6 @@ public class Encode {
                     out.writeBit(Character.getNumericValue(character));
                 }
             }
-            System.out.println("Write codewords: " + (System.currentTimeMillis() - start) + "ms");
-            start = System.currentTimeMillis();
         }
         catch (FileNotFoundException e) {
             System.err.println("Kunne ikke finde stien til output fil");
@@ -124,6 +91,37 @@ public class Encode {
                 }
             }
         }
+    }
+
+    private void start(String inputPath, String outputPath) {
+        long start = System.currentTimeMillis();
+        System.out.println("Reading frequencies...");
+        readFrequencies(inputPath);
+        System.out.println("Read frequencies in " + (System.currentTimeMillis() - start) + "ms.");
+        start = System.currentTimeMillis();
+        System.out.println("Creating huffman tree...");
+        Element huffmanTree = HuffmanTree.getInstance().getHuffmanTreeRoot(frequencies);
+        System.out.println("Created huffman tree in " + (System.currentTimeMillis() - start) + "ms.");
+        start = System.currentTimeMillis();
+        System.out.println("Creating codewords...");
+        createCodeWords((Node) huffmanTree.getData(), "");
+        System.out.println("Created codewords in " + (System.currentTimeMillis() - start) + "ms.");
+        start = System.currentTimeMillis();
+        System.out.println("Writing output...");
+        writeOutput(outputPath, inputPath);
+        System.out.println("Wrote output in " + (System.currentTimeMillis() - start) + "ms.");
+    }
+
+    public static void main(String[] args) {
+        if (args.length == 2) {
+            System.out.println("Initializing...");
+            new Encode().start(args[0], args[1]);
+            System.out.println("Finished.");
+        }
+        else {
+            System.out.println("Illegal syntax.\nUsage: \"nameOfOriginalFile\" \"nameOfCompressedFile\"");
+        }
+
     }
 
 }

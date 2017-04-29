@@ -4,22 +4,11 @@
  */
 public class Element {
     
-    private int key;
-    private Object data;
+    private final int key;
+    private final Object data;
     
     public Element(int key, Object data) {
         this.key = key;
-        this.data = data;
-    }
-
-    public Element() {
-    }
-
-    public Element(int key) {
-        this.key = key;
-    }
-    
-    public Element(Object data) {
         this.data = data;
     }
     
@@ -29,14 +18,6 @@ public class Element {
     
     public Object getData() {
         return data;
-    }
-    
-    public void setKey(int key) {
-        this.key = key;
-    }
-    
-    public void setData(Object data) {
-        this.data = data;
     }
     
 }
