@@ -73,6 +73,10 @@ public class Node {
         this.rightChild = rightChild;
     }
     
+    /**
+     * Returns whether or not a node is a leaf.
+     * @return whether or not a node is a leaf.
+     */
     public boolean isLeaf() {
         return leftChild == null && rightChild == null;
     }

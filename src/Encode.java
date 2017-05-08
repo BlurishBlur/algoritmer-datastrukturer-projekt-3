@@ -12,15 +12,33 @@ import java.util.logging.Logger;
  */
 public class Encode {
 
+    /**
+     * The range of possibilities of 1 byte, or 8 bits.
+     */
     public static final int BYTE_RANGE = 256;
+    
+    /**
+     * The frequencies of bits.
+     */
     private int[] frequencies;
+    
+    /**
+     * The generated codewords.
+     */
     private String[] codeWords;
 
+    /**
+     * Initializes the freuqncies and codewords arrays.
+     */
     public Encode() {
         frequencies = new int[BYTE_RANGE];
         codeWords = new String[BYTE_RANGE];
     }
 
+    /**
+     * Read the input file, and saves the frequencies of the bits.
+     * @param path the filepath to the input file.
+     */
     private void readFrequencies(String path) {
         try (FileInputStream in = new FileInputStream(path)) {
             int currentByte;
@@ -33,6 +51,12 @@ public class Encode {
         }
     }
 
+    /**
+     * Recursively creates codewords, starting at the input node.
+     * @param node where to start creating the codewords from
+     * @param codeWord the current codeword, maintained from the root to
+     * the current position.
+     */
     private void createCodeWords(Node node, String codeWord) {
         if (node != null) {
             if (node.isLeaf()) {
@@ -45,6 +69,11 @@ public class Encode {
         }
     }
 
+    /**
+     * Writes the frequencies and compressed bits to a desired output file.
+     * @param outputPath the filepath of the output file
+     * @param inputPath the filepath of the input file
+     */
     private void writeOutput(String outputPath, String inputPath) {
         BitOutputStream out = null;
         FileInputStream in = null;
@@ -93,6 +122,12 @@ public class Encode {
         }
     }
 
+    /**
+     * Initializes the whole encoding process, calling the different 
+     * methods in the correct order, whilst timing everything.
+     * @param outputPath the filepath of the output file
+     * @param inputPath the filepath of the input file
+     */
     private void start(String inputPath, String outputPath) {
         long start = System.currentTimeMillis();
         System.out.println("Reading frequencies...");

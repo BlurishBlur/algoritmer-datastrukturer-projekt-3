@@ -5,13 +5,27 @@
  */
 public class HuffmanTree {
 
+    /**
+     * The singleton instance of this class.
+     */
     private static HuffmanTree instance;
+    
+    /**
+     * The root of the Huffman tree.
+     */
     private Element root;
 
+    /**
+     * Private constructor for the singleton.
+     */
     private HuffmanTree() {
         root = null;
     }
 
+    /**
+     * Static get-method, for the singleton implementation.
+     * @return the singleton instance of this class.
+     */
     public static HuffmanTree getInstance() {
         if (instance == null) {
             instance = new HuffmanTree();
@@ -19,6 +33,11 @@ public class HuffmanTree {
         return instance;
     }
 
+    /**
+     * Initializes the minheap.
+     * @param frequencies the frequencies to inhabit the heap with.
+     * @return the initialized heap.
+     */
     private PQ initializeHeap(int[] frequencies) {
         PQ heap = new PQHeap(frequencies.length);
         for (int i = 0; i < frequencies.length; i++) {
@@ -27,6 +46,12 @@ public class HuffmanTree {
         return heap;
     }
 
+    /**
+     * Generates the huffmantree and returns the root. If the tree has 
+     * already been generated once, it will always return the same root.
+     * @param frequencies the frequencies of which to generate the tree from.
+     * @return the root of the tree.
+     */
     public Element getHuffmanTreeRoot(int[] frequencies) {
         if (root == null) {
             PQ heap = initializeHeap(frequencies);
@@ -39,7 +64,8 @@ public class HuffmanTree {
                 node.setLeftChild((Node) leftChild.getData());
                 node.setRightChild((Node) rightChild.getData());
 
-                heap.insert(new Element(leftChild.getKey() + rightChild.getKey(), node));
+                heap.insert(new Element(leftChild.getKey() + 
+                        rightChild.getKey(), node));
             }
             root = heap.extractMin();
             return root;

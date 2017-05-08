@@ -11,12 +11,25 @@ import java.util.logging.Logger;
  */
 public class Decode {
 
+    /**
+     * The frequencies of bits.
+     */
     private int[] frequencies;
 
+    /**
+     * Initializes the freuqncies array.
+     */
     public Decode() {
         frequencies = new int[Encode.BYTE_RANGE];
     }
 
+    /**
+     * Reads the file from the bitinputstream, and sums all the frequencies, 
+     * to ensure correct length of the output file.
+     * @param in the bitinputstream to read fom.
+     * @return the total amount of bytes.
+     * @throws IOException 
+     */
     private int readAndSumFrequencies(BitInputStream in) throws IOException {
         int totalBytes = 0;
         for (int i = 0; i < Encode.BYTE_RANGE; i++) {
@@ -26,6 +39,13 @@ public class Decode {
         return totalBytes;
     }
 
+    /**
+     * Decodes the codewords back into bits.
+     * @param totalBytes the total amount of bytes to process.
+     * @param out the output file
+     * @param in the input file.
+     * @throws IOException 
+     */
     private void decodeCodeWords(int totalBytes, FileOutputStream out, BitInputStream in) throws IOException {
         Element huffmanTree = HuffmanTree.getInstance().getHuffmanTreeRoot(frequencies);
         Node node = null;
@@ -52,6 +72,11 @@ public class Decode {
         }
     }
 
+    /**
+     * Writes the decompressed file to a desired output location.
+     * @param inputPath the input file of the compressed file
+     * @param outputPath the output file of the decompressed file
+     */
     private void writeOutput(String inputPath, String outputPath) {
         BitInputStream in = null;
         FileOutputStream out = null;
@@ -84,6 +109,11 @@ public class Decode {
         }
     }
     
+    /**
+     * Initializes the decoding process.
+     * @param inputPath the input file of the compressed file
+     * @param outputPath the output file of the decompressed file
+     */
     private void start(String inputPath, String outputPath) {
         new Decode().writeOutput(inputPath, outputPath);
     }
