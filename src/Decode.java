@@ -24,13 +24,14 @@ public class Decode {
     }
 
     /**
-     * Reads the file from the bitinputstream, and sums all the frequencies, 
-     * to ensure correct length of the output file.
+     * Reads the file from the bitinputstream, and sums the
+     * frequencies, to ensure correct length of the output file.
      * @param in the bitinputstream to read fom.
      * @return the total amount of bytes.
      * @throws IOException 
      */
-    private int readAndSumFrequencies(BitInputStream in) throws IOException {
+    private int readAndSumFrequencies(BitInputStream in) 
+            throws IOException {
         int totalBytes = 0;
         for (int i = 0; i < Encode.BYTE_RANGE; i++) {
             frequencies[i] = in.readInt();
