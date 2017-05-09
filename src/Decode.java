@@ -7,7 +7,7 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author Niels
+ * @author Niels Heltner (nhelt15) & Antonio Lascari (anlas15)
  */
 public class Decode {
 
@@ -46,8 +46,10 @@ public class Decode {
      * @param in the input file.
      * @throws IOException 
      */
-    private void decodeCodeWords(int totalBytes, FileOutputStream out, BitInputStream in) throws IOException {
-        Element huffmanTree = HuffmanTree.getInstance().getHuffmanTreeRoot(frequencies);
+    private void decodeCodeWords(int totalBytes, FileOutputStream out,
+            BitInputStream in) throws IOException {
+        Element huffmanTree = 
+                HuffmanTree.getInstance().getHuffmanTreeRoot(frequencies);
         Node node = null;
         int currentBit;
         int writtenBytes = 0;
@@ -94,16 +96,16 @@ public class Decode {
                 try {
                     in.close();
                 }
-                catch (IOException ex) {
-                    Logger.getLogger(Decode.class.getName()).log(Level.SEVERE, null, ex);
+                catch (IOException e) {
+                    System.err.println("Error when closing inputstream.");
                 }
             }
             if (out != null) {
                 try {
                     out.close();
                 }
-                catch (IOException ex) {
-                    Logger.getLogger(Decode.class.getName()).log(Level.SEVERE, null, ex);
+                catch (IOException e) {
+                    System.err.println("Error when closing outputstream.");
                 }
             }
         }
@@ -125,7 +127,8 @@ public class Decode {
             System.out.println("Finished.");
         }
         else {
-            System.out.println("Illegal syntax.\nUsage: \"nameOfCompressedFile\" \"nameOfOriginalFile\"");
+            System.out.println("Illegal syntax.\nUsage: "
+                    + "\"nameOfCompressedFile\" \"nameOfOriginalFile\"");
         }
     }
 
