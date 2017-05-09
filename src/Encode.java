@@ -159,7 +159,8 @@ public class Encode {
             System.out.println("Finished.");
         }
         else {
-            System.out.println("Illegal syntax.\nUsage: \"nameOfOriginalFile\" \"nameOfCompressedFile\"");
+            System.out.println("Illegal syntax.\nUsage: "
+                    + "\"nameOfOriginalFile\" \"nameOfCompressedFile\"");
         }
 
     }
