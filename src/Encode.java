@@ -132,19 +132,24 @@ public class Encode {
         long start = System.currentTimeMillis();
         System.out.println("Reading frequencies...");
         readFrequencies(inputPath);
-        System.out.println("Read frequencies in " + (System.currentTimeMillis() - start) + "ms.");
+        System.out.println("Read frequencies in " + 
+                (System.currentTimeMillis() - start) + "ms.");
         start = System.currentTimeMillis();
         System.out.println("Creating huffman tree...");
-        Element huffmanTree = HuffmanTree.getInstance().getHuffmanTreeRoot(frequencies);
-        System.out.println("Created huffman tree in " + (System.currentTimeMillis() - start) + "ms.");
+        Element huffmanTree = 
+                HuffmanTree.getInstance().getHuffmanTreeRoot(frequencies);
+        System.out.println("Created huffman tree in " + 
+                (System.currentTimeMillis() - start) + "ms.");
         start = System.currentTimeMillis();
         System.out.println("Creating codewords...");
         createCodeWords((Node) huffmanTree.getData(), "");
-        System.out.println("Created codewords in " + (System.currentTimeMillis() - start) + "ms.");
+        System.out.println("Created codewords in " + 
+                (System.currentTimeMillis() - start) + "ms.");
         start = System.currentTimeMillis();
         System.out.println("Writing output...");
         writeOutput(outputPath, inputPath);
-        System.out.println("Wrote output in " + (System.currentTimeMillis() - start) + "ms.");
+        System.out.println("Wrote output in " + 
+                (System.currentTimeMillis() - start) + "ms.");
     }
 
     public static void main(String[] args) {
